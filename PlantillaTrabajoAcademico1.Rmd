@@ -1,0 +1,109 @@
+---
+title: "Título del trabajo"
+author: "Teresa Beltrá, Alexandra Monlleó, Lucía Mora, Marta Pla, Paula Sanz (Grupo A2-21)"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = FALSE, include = TRUE, warning = FALSE)
+library(tinytex)
+```
+
+
+
+# Exploración y preparación de la BBDD  [3 páginas máximo]
+Para poder descargar nuestros datos, al tener un archivo .RData, no sale de manera binaria y debemos de cargarlo con load. Entonces, no podemos observar nuestros datos.
+
+Se observa que la base de datos tiene tantas observacones(filas) y tantas variables(columnas).
+Se han registrado `rncol(paises)` variables para `r now(paises)` vehiculos de toyota
+
+
+
+## Descripción y naturaleza de las variables
+
+
+<!-- Incluir tabla con las variables, su descripción y el tipo de variable (numérica, categórica nominal, categórica ordinal, identificador, fecha, etc.) -->
+
+<!-- Indicar el número de observaciones iniciales en la BBDD. -->
+```{r}
+dim(datosA)
+ncol(datosA)
+nrow(datosA)
+```
+
+
+```{r}
+descPaises = data.frame(
+  variable = colnames(datosA),
+  tipo = c(
+    "categorical",   # Country
+    "categorical",   # Code
+    rep("numerical", 21),  # variables numéricas intermedias
+    "categorical",   # Developed
+    "numerical",     # HDI
+    "categorical"    # HDIGroup
+  ),
+  stringsAsFactors = FALSE
+)
+
+rownames(descPaises) = descPaises$variable
+descPaises
+```
+```{r}
+summary(datosA)
+
+```
+
+```{r}
+
+datosA$Code      <- as.factor(datosA$Code)
+datosA$HDIGroup  <- as.factor(datosA$HDIGroup)
+datosA$Developed <- as.factor(datosA$Developed)
+
+```
+
+
+## Análisis descriptivo
+
+<!-- Incluir resultados que muestren posibles anomalías detectadas e indicar cómo se han corregido. -->
+
+<!-- Si se elimina alguna observación o variable, indicarlo claramente y justificarlo. -->
+
+
+
+# Análisis de Componentes Principales  [5 páginas máximo]
+
+
+## Tratamiento de los datos
+
+<!-- Selección de variables a incluir en el modelo? Centrado y escalado? Transformación de variables? -->
+
+
+## Selección del número de componentes principales
+
+
+
+
+## Validación del modelo
+
+<!-- Detección de valores anómalos y decisiones tomadas a partir de los mismos. -->
+
+
+## Interpretación del modelo
+
+<!-- Interpretación del gráfico de scores y de loadings o de variables. -->
+
+
+## Conclusiones
+
+
+
+
+# Reglas de asociación  [OPCIONAL. 2 páginas máximo]
+
+
+
+# Análisis Factorial de Correspondencias  [OPCIONAL. 2 páginas máximo]
+
