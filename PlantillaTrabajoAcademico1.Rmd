@@ -1,8 +1,11 @@
 ---
 title: "Título del trabajo"
-author: "Teresa Beltrá, Alexandra Monlleó, Lucía Mora, Marta Pla, Paula Sanz (Grupo A2-21)"
+author: "NOMBRES Y APELLIDOS de los autores (Grupo XX-XX)"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 ---
 
 
@@ -11,26 +14,25 @@ knitr::opts_chunk$set(echo = FALSE, cache = FALSE, include = TRUE, warning = FAL
 library(tinytex)
 ```
 
-
-
 # Exploración y preparación de la BBDD  [3 páginas máximo]
+
 Para poder descargar nuestros datos, al tener un archivo .RData, no sale de manera binaria y debemos de cargarlo con load. Entonces, no podemos observar nuestros datos.
 
 Se observa que la base de datos tiene tantas observacones(filas) y tantas variables(columnas).
 Se han registrado `rncol(paises)` variables para `r now(paises)` vehiculos de toyota
 
 
-
 ## Descripción y naturaleza de las variables
-
 
 <!-- Incluir tabla con las variables, su descripción y el tipo de variable (numérica, categórica nominal, categórica ordinal, identificador, fecha, etc.) -->
 
 <!-- Indicar el número de observaciones iniciales en la BBDD. -->
+
 ```{r}
+load("16A_paises.RData")
 dim(datosA)
-ncol(datosA)
 nrow(datosA)
+ncol(datosA)
 ```
 
 
@@ -38,12 +40,12 @@ nrow(datosA)
 descPaises = data.frame(
   variable = colnames(datosA),
   tipo = c(
-    "categorical",   # Country
-    "categorical",   # Code
-    rep("numerical", 21),  # variables numéricas intermedias
-    "categorical",   # Developed
-    "numerical",     # HDI
-    "categorical"    # HDIGroup
+    "text",                 # Code
+    rep("numerical", 22),   # Variables numéricas intermedias
+    "categorical",          # Developed
+    "numerical",            # HDI
+    "categorical"           # HDI Group
+    
   ),
   stringsAsFactors = FALSE
 )
@@ -51,17 +53,14 @@ descPaises = data.frame(
 rownames(descPaises) = descPaises$variable
 descPaises
 ```
+
 ```{r}
 summary(datosA)
-
 ```
-
 ```{r}
-
 datosA$Code      <- as.factor(datosA$Code)
 datosA$HDIGroup  <- as.factor(datosA$HDIGroup)
 datosA$Developed <- as.factor(datosA$Developed)
-
 ```
 
 
@@ -70,8 +69,50 @@ datosA$Developed <- as.factor(datosA$Developed)
 <!-- Incluir resultados que muestren posibles anomalías detectadas e indicar cómo se han corregido. -->
 
 <!-- Si se elimina alguna observación o variable, indicarlo claramente y justificarlo. -->
+```{r}
+paises2 = subset(datosA, select = -Code)
+descPaises = descPaises[colnames(paises2),]
+table(descPaises$tipo)
+```
 
 
+VARIABLES NUMÉRICAS:
+```{r}
+summary(paises2[, descPaises$variable[descPaises$tipo == "numerical"]])
+```
+
+Desviación típica de variables numéricas:
+```{r}
+mySD = apply(paises2[, descPaises$variable[descPaises$tipo == "numerical"]], 2, sd)
+myMU = colMeans(paises2[, descPaises$variable[descPaises$tipo == "numerical"]])
+myCV = mySD / myMU
+sort(myCV)
+```
+
+No tenemos variables binarias.
+
+VARIABLES CATEGÓRICAS:
+```{r}
+apply(paises2[,descPaises$variable[descPaises$tipo == "categorical"]], 2,
+      function (x) round(100*table(x)/sum(table(x)), 2))
+```
+
+
+
+#####VALORES ANÓMALOS Y VALORES INCONSISTENTES
+
+```{r}
+par(mar = c(9,4,2,2))
+boxplot(paises2[,descPaises$variable[descPaises$tipo == "numerical"]] + 1, log="y",las = 2)
+```
+
+
+```{r}
+## CC 
+par(mfrow = c(1,2))   # mfcol
+hist(paises2$Health, 50)
+boxplot(paises2$Health, xlab = "Health")
+```
 
 # Análisis de Componentes Principales  [5 páginas máximo]
 
